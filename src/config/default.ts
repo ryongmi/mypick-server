@@ -9,7 +9,7 @@ export default (): DefaultConfig => {
       port: parseInt(process.env.PORT ?? '8300', 10),
       tcpPort: parseInt(process.env.TCP_PORT ?? '8310', 10),
       corsOrigins: process.env.CORS_ORIGINS,
-      myPickServerUrl: process.env.MY_PICK_SERVER_URL ?? 'http://localhost:8300/my-pick',
+      myPickServerUrl: process.env.MY_PICK_SERVER_URL ?? 'http://localhost:8300/mypick',
     };
   }
 
@@ -18,7 +18,7 @@ export default (): DefaultConfig => {
     port: parseInt(process.env.PORT ?? '8300', 10),
     tcpPort: parseInt(process.env.TCP_PORT ?? '8310', 10),
     corsOrigins: process.env.CORS_ORIGINS,
-    myPickServerUrl: process.env.MY_PICK_SERVER_URL ?? 'http://localhost:8300/my-pick',
+    myPickServerUrl: process.env.MY_PICK_SERVER_URL ?? 'http://localhost:8300/mypick',
   };
 };
 

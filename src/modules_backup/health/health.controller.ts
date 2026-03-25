@@ -27,7 +27,7 @@ export class HealthController {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
-      service: 'my-pick-server',
+      service: 'mypick-server',
       version: '0.0.1',
     };
   }
