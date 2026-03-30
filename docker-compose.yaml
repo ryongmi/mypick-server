@@ -1,17 +1,17 @@
 version: '3.8'
 #
-# my-pick-server는 중앙 집중식 인프라(krgeobuk-infrastructure)를 사용합니다.
+# mypick-server는 중앙 집중식 인프라(krgeobuk-infrastructure)를 사용합니다.
 # MySQL과 Redis는 krgeobuk-infrastructure/docker-compose/docker-compose.yaml에서 제공됩니다.
 #
 # 실행 순서:
 # 1. krgeobuk-infrastructure 먼저 시작: cd ../../krgeobuk-infrastructure/docker-compose/ && docker-compose up -d
-# 2. my-pick-server 시작: npm run docker:local:up
+# 2. mypick-server 시작: npm run docker:local:up
 #
 
 services:
   server:
-    image: krgeobuk/my-pick-server:local
-    container_name: my-pick-server
+    image: krgeobuk/mypick-server:local
+    container_name: mypick-server
     build:
       context: .
       dockerfile: Dockerfile
