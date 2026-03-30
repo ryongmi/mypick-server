@@ -1474,4 +1474,4 @@ socket.on('new-notification', (notification) => {
 
 ---
 
-이 API 명세서는 my-pick-client의 mock API 구조를 기반으로 실제 서버 구현에 필요한 모든 엔드포인트와 데이터 구조를 정의합니다. NestJS 프레임워크를 사용한 구현 시 이 명세를 참조하여 개발을 진행할 수 있습니다.
+이 API 명세서는 mypick-client의 mock API 구조를 기반으로 실제 서버 구현에 필요한 모든 엔드포인트와 데이터 구조를 정의합니다. NestJS 프레임워크를 사용한 구현 시 이 명세를 참조하여 개발을 진행할 수 있습니다.

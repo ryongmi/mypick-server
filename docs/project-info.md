@@ -101,7 +101,7 @@ MyPick Server는 크리에이터/유튜버 팬들을 위한 통합 콘텐츠 허
 ## 📁 상세 프로젝트 구조
 
 ```
-my-pick-server/
+mypick-server/
 ├── src/
 │   ├── app.module.ts                      # 루트 애플리케이션 모듈
 │   ├── main.ts                            # 애플리케이션 진입점
@@ -1053,8 +1053,8 @@ RATE_LIMIT_MAX_REQUESTS=100
 ### 개발 시작하기
 ```bash
 # 1. 저장소 클론
-git clone https://github.com/your-org/my-pick-server.git
-cd my-pick-server
+git clone https://github.com/your-org/mypick-server.git
+cd mypick-server
 
 # 2. 의존성 설치
 npm install

@@ -1,5 +1,5 @@
 # Domain Architecture Analysis Report
-## krgeobuk-infra: my-pick-server
+## krgeobuk-infra: mypick-server
 
 **생성일**: 2025년 8월 19일  
 **분석 대상**: 9개 도메인 모듈  
