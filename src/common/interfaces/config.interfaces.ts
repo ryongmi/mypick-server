@@ -34,6 +34,7 @@ export interface RedisConfig {
 
 export interface YouTubeConfig {
   youtubeApiKey: string | undefined;
+  youtubeBaseUrl: string | undefined;
 }
 
 export interface NaverConfig {

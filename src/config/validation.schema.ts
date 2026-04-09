@@ -35,6 +35,7 @@ const redisConfigSchema = {
 
 const youtubeConfigSchema = {
   YOUTUBE_API_KEY: Joi.string().required(),
+  YOUTUBE_BASE_URL: Joi.string().default('https://www.googleapis.com/youtube/v3'),
 };
 
 const jwtConfigSchema = {

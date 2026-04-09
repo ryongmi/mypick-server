@@ -76,7 +76,7 @@ interface YouTubeChannelApiData {
 export class YouTubeApiService {
   private readonly logger = new Logger(YouTubeApiService.name);
   private readonly apiKey: string;
-  private readonly baseUrl = 'https://www.googleapis.com/youtube/v3';
+  private readonly baseUrl: string;
 
   constructor(
     private readonly httpService: HttpService,
@@ -84,6 +84,7 @@ export class YouTubeApiService {
     private readonly quotaMonitor: QuotaMonitorService
   ) {
     this.apiKey = this.configService.get<string>('youtube.youtubeApiKey')!;
+    this.baseUrl = this.configService.get<string>('youtube.youtubeBaseUrl')!;
 
     if (!this.apiKey) {
       this.logger.error('YouTube API key not configured');

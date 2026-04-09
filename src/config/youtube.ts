@@ -6,5 +6,6 @@ export const youtubeConfig = registerAs(
   'youtube',
   (): YouTubeConfig => ({
     youtubeApiKey: process.env.YOUTUBE_API_KEY,
+    youtubeBaseUrl: process.env.YOUTUBE_BASE_URL,
   })
 );
