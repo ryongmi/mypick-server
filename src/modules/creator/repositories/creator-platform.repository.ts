@@ -12,21 +12,6 @@ export class CreatorPlatformRepository extends BaseRepository<CreatorPlatformEnt
     super(CreatorPlatformEntity, dataSource);
   }
 
-  // async findByCreatorId(creatorId: string): Promise<CreatorPlatformEntity[]> {
-  //   return this.find({
-  //     where: { creatorId, isActive: true },
-  //   });
-  // }
-
-  // async findByPlatformTypeAndId(
-  //   platformType: PlatformType,
-  //   platformId: string
-  // ): Promise<CreatorPlatformEntity | null> {
-  //   return this.findOne({
-  //     where: { platformType, platformId },
-  //   });
-  // }
-
   async findWithCreator(platformId: string): Promise<{
     platform: CreatorPlatformEntity;
     creator: { id: string; name: string; profileImageUrl?: string };

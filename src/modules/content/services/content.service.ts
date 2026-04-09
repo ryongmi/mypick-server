@@ -104,19 +104,6 @@ export class ContentService {
   }
 
   /**
-   * 크리에이터의 콘텐츠 목록 조회
-   */
-  // async findByCreatorId(
-  //   creatorId: string,
-  //   options?: {
-  //     limit?: number;
-  //     offset?: number;
-  //   }
-  // ): Promise<ContentEntity[]> {
-  //   return this.contentRepository.findByCreatorId(creatorId, options);
-  // }
-
-  /**
    * 크리에이터와 함께 콘텐츠 조회
    */
   async findWithCreator(contentId: string): Promise<ContentWithCreatorDto | null> {
@@ -180,92 +167,6 @@ export class ContentService {
       creator: creatorInfo,
     };
   }
-
-  /**
-   * 콘텐츠 생성 (YouTube 동기화용)
-   */
-  // async createContent(dto: CreateContentInput): Promise<ContentEntity> {
-  //   // 중복 콘텐츠 체크
-  //   const existing = await this.findByPlatformAndId(dto.platform, dto.platformId);
-  //   if (existing) {
-  //     this.logger.warn('Content already exists', {
-  //       platform: dto.platform,
-  //       platformId: dto.platformId,
-  //     });
-  //     return existing;
-  //   }
-
-  //   // 외래키 검증: Creator가 존재하는지 확인
-  //   await this.creatorService.findByIdOrFail(dto.creatorId);
-
-  //   const contentData: {
-  //     type: ContentType;
-  //     title: string;
-  //     thumbnail: string;
-  //     url: string;
-  //     platform: PlatformType;
-  //     platformId: string;
-  //     publishedAt: Date;
-  //     creatorId: string;
-  //     isLive: boolean;
-  //     ageRestriction: boolean;
-  //     status: ContentStatus;
-  //     statistics: ContentStatistics;
-  //     syncInfo: ContentSyncInfo;
-  //     description?: string;
-  //     duration?: number;
-  //     language?: string;
-  //     quality?: ContentQuality;
-  //   } = {
-  //     type: dto.type,
-  //     title: dto.title,
-  //     thumbnail: dto.thumbnail,
-  //     url: dto.url,
-  //     platform: dto.platform,
-  //     platformId: dto.platformId,
-  //     publishedAt: dto.publishedAt,
-  //     creatorId: dto.creatorId,
-  //     isLive: dto.isLive ?? false,
-  //     ageRestriction: dto.ageRestriction ?? false,
-  //     status: ContentStatus.ACTIVE,
-  //     statistics: {
-  //       views: 0,
-  //       likes: 0,
-  //       comments: 0,
-  //       shares: 0,
-  //       engagementRate: 0,
-  //       updatedAt: new Date().toISOString(),
-  //     },
-  //     syncInfo: {
-  //       lastSyncedAt: new Date().toISOString(),
-  //       syncStatus: ContentSyncStatus.COMPLETED,
-  //     },
-  //   };
-  //   if (dto.description !== undefined) {
-  //     contentData.description = dto.description;
-  //   }
-  //   if (dto.duration !== undefined) {
-  //     contentData.duration = dto.duration;
-  //   }
-  //   if (dto.language !== undefined) {
-  //     contentData.language = dto.language;
-  //   }
-  //   if (dto.quality !== undefined) {
-  //     contentData.quality = dto.quality;
-  //   }
-
-  //   const content = this.contentRepository.create(contentData);
-
-  //   const saved = await this.contentRepository.save(content);
-
-  //   this.logger.log('Content created successfully', {
-  //     contentId: saved.id,
-  //     platform: saved.platform,
-  //     platformId: saved.platformId,
-  //   });
-
-  //   return saved;
-  // }
 
   /**
    * 플랫폼 ID 목록으로 콘텐츠 조회 (UPSERT 용)

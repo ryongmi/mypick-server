@@ -50,8 +50,4 @@ export class ApiQuotaUsageRepository extends BaseRepository<ApiQuotaUsageEntity>
       deletedCount: deleteResult.affected || 0,
     };
   }
-
-  // async getTotalRecordCount(): Promise<number> {
-  //   return this.count();
-  // }
 }
