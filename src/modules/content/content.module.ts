@@ -16,6 +16,8 @@ import { ContentTagRepository } from './repositories/content-tag.repository.js';
 import { ContentService } from './services/content.service.js';
 import { ContentCategoryService } from './services/content-category.service.js';
 import { ContentController } from './controllers/content.controller.js';
+import { ContentInteractionController } from './controllers/content-interaction.controller.js';
+import { ContentSyncController } from './controllers/content-sync.controller.js';
 
 @Module({
   imports: [
@@ -31,7 +33,7 @@ import { ContentController } from './controllers/content.controller.js';
     forwardRef(() => ExternalApiModule),
     ImageModule,
   ],
-  controllers: [ContentController],
+  controllers: [ContentController, ContentInteractionController, ContentSyncController],
   providers: [
     ContentRepository,
     ContentCategoryRepository,

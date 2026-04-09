@@ -281,7 +281,7 @@ export class UserSubscriptionService {
       });
 
       // sourceCreatorIds가 제공되지 않은 경우, 현재 target의 모든 구독을 되돌림 (안전 장치)
-      let creatorIdsToRestore = sourceCreatorIds;
+      const creatorIdsToRestore = sourceCreatorIds;
 
       if (!creatorIdsToRestore || creatorIdsToRestore.length === 0) {
         this.logger.warn('No sourceCreatorIds provided, skipping rollback', {
