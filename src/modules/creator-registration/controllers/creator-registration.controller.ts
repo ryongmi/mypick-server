@@ -11,7 +11,12 @@ import {
 
 import { AuthenticatedJwt } from '@krgeobuk/jwt/interfaces';
 import { CurrentJwt } from '@krgeobuk/jwt/decorators';
-import { AccessTokenGuard, OptionalAccessTokenGuard } from '@krgeobuk/jwt/guards';
+import { AccessTokenGuard } from '@krgeobuk/jwt/guards';
+import { AuthorizationGuard } from '@krgeobuk/authorization/guards';
+import { RequireAccess } from '@krgeobuk/authorization/decorators';
+import { SERVICE_CONSTANTS, GLOBAL_ROLES } from '@krgeobuk/core/constants';
+
+import { CREATOR_REGISTRATION_PERMISSIONS } from '../constants/index.js';
 import {
   SwaggerApiTags,
   SwaggerApiOperation,
@@ -100,19 +105,34 @@ export class CreatorRegistrationController {
   }
 
   /**
-   * 신청 목록 조회
-   * TODO: Add AdminGuard when available
+   * 신청 목록 조회 (관리자 전용)
    */
   @SwaggerApiOperation({
     summary: '신청 목록 조회',
     description: '크리에이터 신청 목록을 조회합니다. (관리자용)',
   })
+  @SwaggerApiBearerAuth()
   @SwaggerApiOkResponse({
     status: 200,
     description:
       '신청 목록 조회 성공 (응답: { registrations: RegistrationDetailDto[], total: number })',
   })
+  @SwaggerApiErrorResponse({
+    status: 401,
+    description: '인증이 필요합니다',
+  })
+  @SwaggerApiErrorResponse({
+    status: 403,
+    description: '관리자 권한이 필요합니다',
+  })
   @Get()
+  @UseGuards(AccessTokenGuard, AuthorizationGuard)
+  @RequireAccess({
+    permissions: [CREATOR_REGISTRATION_PERMISSIONS.READ],
+    roles: [GLOBAL_ROLES.SUPER_ADMIN, GLOBAL_ROLES.ADMIN],
+    combinationOperator: 'OR',
+    serviceId: SERVICE_CONSTANTS.MYPICK_SERVICE.id,
+  })
   async searchRegistrations(
     @Query('status') status?: string,
     @Query('limit') limit?: string,
@@ -138,19 +158,34 @@ export class CreatorRegistrationController {
   }
 
   /**
-   * 신청 통계 조회
-   * TODO: Add AdminGuard when available
+   * 신청 통계 조회 (관리자 전용)
    */
   @SwaggerApiOperation({
     summary: '신청 통계 조회',
     description: '크리에이터 신청 통계를 조회합니다. (관리자용)',
   })
+  @SwaggerApiBearerAuth()
   @SwaggerApiOkResponse({
     status: 200,
     description:
       '통계 조회 성공 (응답: { pending: number, approved: number, rejected: number, total: number })',
   })
+  @SwaggerApiErrorResponse({
+    status: 401,
+    description: '인증이 필요합니다',
+  })
+  @SwaggerApiErrorResponse({
+    status: 403,
+    description: '관리자 권한이 필요합니다',
+  })
   @Get('stats')
+  @UseGuards(AccessTokenGuard, AuthorizationGuard)
+  @RequireAccess({
+    permissions: [CREATOR_REGISTRATION_PERMISSIONS.READ],
+    roles: [GLOBAL_ROLES.SUPER_ADMIN, GLOBAL_ROLES.ADMIN],
+    combinationOperator: 'OR',
+    serviceId: SERVICE_CONSTANTS.MYPICK_SERVICE.id,
+  })
   async getStats(): Promise<{
     pending: number;
     approved: number;
@@ -202,14 +237,13 @@ export class CreatorRegistrationController {
   }
 
   /**
-   * 신청 검토 (승인/거부)
-   * TODO: Add AdminGuard when available
-   * TODO: Get reviewerId from JWT token
+   * 신청 검토 (승인/거부) (관리자 전용)
    */
   @SwaggerApiOperation({
     summary: '신청 검토 (승인/거부)',
     description: '크리에이터 신청을 승인하거나 거부합니다. (관리자용)',
   })
+  @SwaggerApiBearerAuth()
   @SwaggerApiParam({
     name: 'id',
     type: String,
@@ -230,21 +264,34 @@ export class CreatorRegistrationController {
     description: '잘못된 요청 (거부 시 사유 필수)',
   })
   @SwaggerApiErrorResponse({
+    status: 401,
+    description: '인증이 필요합니다',
+  })
+  @SwaggerApiErrorResponse({
+    status: 403,
+    description: '관리자 권한이 필요합니다',
+  })
+  @SwaggerApiErrorResponse({
     status: 404,
     description: '신청을 찾을 수 없습니다',
   })
   @Post(':id/review')
+  @UseGuards(AccessTokenGuard, AuthorizationGuard)
+  @RequireAccess({
+    permissions: [CREATOR_REGISTRATION_PERMISSIONS.REVIEW],
+    roles: [GLOBAL_ROLES.SUPER_ADMIN, GLOBAL_ROLES.ADMIN],
+    combinationOperator: 'OR',
+    serviceId: SERVICE_CONSTANTS.MYPICK_SERVICE.id,
+  })
   async reviewRegistration(
     @Param('id') id: string,
-    @Body() dto: ReviewRegistrationDto & { reviewerId: string }
+    @CurrentJwt() { userId }: AuthenticatedJwt,
+    @Body() dto: ReviewRegistrationDto
   ): Promise<{ creatorId?: string; message: string }> {
-    // TODO: Get reviewerId from JWT token
-    const reviewerId = dto.reviewerId || 'system';
-
     if (dto.status === RegistrationStatus.APPROVED) {
       const creatorId = await this.registrationService.approveRegistration(
         id,
-        reviewerId,
+        userId,
         dto.comment
       );
       return { creatorId, message: '신청이 승인되었습니다.' };
@@ -252,11 +299,10 @@ export class CreatorRegistrationController {
       if (!dto.reason) {
         throw CreatorRegistrationException.rejectionReasonRequired();
       }
-      await this.registrationService.rejectRegistration(id, reviewerId, dto.reason, dto.comment);
+      await this.registrationService.rejectRegistration(id, userId, dto.reason, dto.comment);
       return { message: '신청이 거부되었습니다.' };
     } else {
       throw new BadRequestException('Invalid status');
     }
   }
 }
-
