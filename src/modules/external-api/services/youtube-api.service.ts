@@ -369,6 +369,78 @@ export class YouTubeApiService {
     }
   }
 
+  // ==================== WRITE METHODS (OAuth 토큰 필요) ====================
+
+  /**
+   * YouTube 영상에 댓글 작성
+   * - commentThreads.insert API (할당량 50 소모)
+   */
+  async insertComment(
+    accessToken: string,
+    videoId: string,
+    text: string
+  ): Promise<{ commentId: string }> {
+    try {
+      this.logger.debug(`Inserting YouTube comment on video: ${videoId}`);
+
+      const response = await lastValueFrom(
+        this.httpService
+          .post(
+            `${this.baseUrl}/commentThreads`,
+            {
+              snippet: {
+                videoId,
+                topLevelComment: {
+                  snippet: {
+                    textOriginal: text,
+                  },
+                },
+              },
+            },
+            {
+              params: { part: 'snippet' },
+              headers: { Authorization: `Bearer ${accessToken}` },
+            }
+          )
+          .pipe(map((res) => res.data))
+      );
+
+      this.logger.debug(`YouTube comment inserted on video: ${videoId}`);
+      return { commentId: response.id as string };
+    } catch (error: unknown) {
+      this.logger.error(`Failed to insert comment on video: ${videoId}`, error);
+      throw ExternalApiException.youtubeWriteApiError();
+    }
+  }
+
+  /**
+   * YouTube 영상 좋아요 추가
+   * - videos.rate API (할당량 50 소모)
+   */
+  async likeVideo(accessToken: string, videoId: string): Promise<void> {
+    try {
+      this.logger.debug(`Liking YouTube video: ${videoId}`);
+
+      await lastValueFrom(
+        this.httpService
+          .post(
+            `${this.baseUrl}/videos/rate`,
+            null,
+            {
+              params: { id: videoId, rating: 'like' },
+              headers: { Authorization: `Bearer ${accessToken}` },
+            }
+          )
+          .pipe(map((res) => res.data))
+      );
+
+      this.logger.debug(`YouTube video liked: ${videoId}`);
+    } catch (error: unknown) {
+      this.logger.error(`Failed to like video: ${videoId}`, error);
+      throw ExternalApiException.youtubeWriteApiError();
+    }
+  }
+
   // ==================== PRIVATE METHODS ====================
 
   private async getUploadsPlaylistId(channelId: string): Promise<string | null> {

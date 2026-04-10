@@ -8,7 +8,12 @@ import { ContentModule } from '../content/content.module.js';
 
 import { ApiQuotaUsageEntity } from './entities/index.js';
 import { ApiQuotaUsageRepository } from './repositories/index.js';
-import { YouTubeApiService, QuotaMonitorService, YouTubeSyncScheduler } from './services/index.js';
+import {
+  YouTubeApiService,
+  QuotaMonitorService,
+  YouTubeSyncScheduler,
+} from './services/index.js';
+import { YouTubeOAuthService } from './services/youtube-oauth.service.js';
 
 @Module({
   imports: [
@@ -30,12 +35,14 @@ import { YouTubeApiService, QuotaMonitorService, YouTubeSyncScheduler } from './
     YouTubeApiService,
     QuotaMonitorService,
     YouTubeSyncScheduler,
+    YouTubeOAuthService,
   ],
   exports: [
     // 다른 모듈에서 사용할 수 있도록 export
     YouTubeApiService,
     QuotaMonitorService,
     YouTubeSyncScheduler,
+    YouTubeOAuthService,
   ],
 })
 export class ExternalApiModule {}

@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   BadRequestException,
   ServiceUnavailableException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 export class ExternalApiException {
@@ -47,6 +48,27 @@ export class ExternalApiException {
     return new BadRequestException({
       code: 'EXTERNAL_API_106',
       message: 'YouTube API 응답 데이터 검증에 실패했습니다.',
+    });
+  }
+
+  static youtubeTokenNotFound(): HttpException {
+    return new UnauthorizedException({
+      code: 'EXTERNAL_API_107',
+      message: 'YouTube OAuth 토큰이 없습니다. Google 계정으로 다시 로그인해주세요.',
+    });
+  }
+
+  static youtubeTokenRefreshFailed(): HttpException {
+    return new InternalServerErrorException({
+      code: 'EXTERNAL_API_108',
+      message: 'YouTube 토큰 갱신에 실패했습니다. Google 계정으로 다시 로그인해주세요.',
+    });
+  }
+
+  static youtubeWriteApiError(): HttpException {
+    return new ServiceUnavailableException({
+      code: 'EXTERNAL_API_109',
+      message: 'YouTube 쓰기 작업 중 오류가 발생했습니다.',
     });
   }
 

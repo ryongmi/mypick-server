@@ -5,9 +5,12 @@ import {
   Delete,
   Query,
   Param,
+  Body,
   HttpCode,
   UseGuards,
 } from '@nestjs/common';
+
+import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
 
 import { Serialize } from '@krgeobuk/core/decorators';
 import { AccessTokenGuard } from '@krgeobuk/jwt/guards';
@@ -28,6 +31,15 @@ import { ContentService } from '../services/content.service.js';
 import { ContentSearchQueryDto } from '../dto/search-query.dto.js';
 import { ContentWithCreatorDto } from '../dto/content-response.dto.js';
 import { UserInteractionService } from '../../user-interaction/services/user-interaction.service.js';
+import { YouTubeOAuthService } from '../../external-api/services/youtube-oauth.service.js';
+import { YouTubeApiService } from '../../external-api/services/youtube-api.service.js';
+
+class PostYouTubeCommentDto {
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(10000)
+  text!: string;
+}
 
 @SwaggerApiTags({ tags: ['content'] })
 @SwaggerApiBearerAuth()
@@ -36,7 +48,9 @@ import { UserInteractionService } from '../../user-interaction/services/user-int
 export class ContentInteractionController {
   constructor(
     private readonly contentService: ContentService,
-    private readonly interactionService: UserInteractionService
+    private readonly interactionService: UserInteractionService,
+    private readonly youtubeOAuthService: YouTubeOAuthService,
+    private readonly youtubeApiService: YouTubeApiService
   ) {}
 
   // ==================== BOOKMARK ENDPOINTS ====================
@@ -247,5 +261,86 @@ export class ContentInteractionController {
     @CurrentJwt() { userId }: AuthenticatedJwt
   ): Promise<void> {
     await this.interactionService.unlikeContent(userId, contentId);
+  }
+
+  // ==================== YOUTUBE ACTION ENDPOINTS ====================
+
+  /**
+   * YouTube 댓글 작성
+   * POST /content/:id/youtube-comment
+   */
+  @SwaggerApiOperation({
+    summary: 'YouTube 댓글 작성',
+    description: '콘텐츠의 YouTube 원본 영상에 댓글을 작성합니다. Google OAuth 토큰이 필요합니다.',
+  })
+  @SwaggerApiParam({
+    name: 'id',
+    type: String,
+    description: '콘텐츠 ID',
+    required: true,
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @SwaggerApiOkResponse({
+    status: 201,
+    description: '댓글 작성 성공 (응답: { commentId: string })',
+  })
+  @SwaggerApiErrorResponse({
+    status: 401,
+    description: 'YouTube OAuth 토큰이 없습니다. Google 재로그인 필요',
+  })
+  @SwaggerApiErrorResponse({
+    status: 404,
+    description: '콘텐츠를 찾을 수 없습니다',
+  })
+  @Post(':id/youtube-comment')
+  @HttpCode(201)
+  @Serialize({ message: 'YouTube 댓글 작성 성공' })
+  async postYouTubeComment(
+    @Param('id') contentId: string,
+    @CurrentJwt() { userId }: AuthenticatedJwt,
+    @Body() dto: PostYouTubeCommentDto
+  ): Promise<{ commentId: string }> {
+    const content = await this.contentService.findByIdOrFail(contentId);
+    const { accessToken } = await this.youtubeOAuthService.getAccessToken(userId);
+    return this.youtubeApiService.insertComment(accessToken, content.platformId, dto.text);
+  }
+
+  /**
+   * YouTube 좋아요
+   * POST /content/:id/youtube-like
+   */
+  @SwaggerApiOperation({
+    summary: 'YouTube 좋아요',
+    description: '콘텐츠의 YouTube 원본 영상에 좋아요를 누릅니다. Google OAuth 토큰이 필요합니다.',
+  })
+  @SwaggerApiParam({
+    name: 'id',
+    type: String,
+    description: '콘텐츠 ID',
+    required: true,
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @SwaggerApiOkResponse({
+    status: 204,
+    description: 'YouTube 좋아요 성공',
+  })
+  @SwaggerApiErrorResponse({
+    status: 401,
+    description: 'YouTube OAuth 토큰이 없습니다. Google 재로그인 필요',
+  })
+  @SwaggerApiErrorResponse({
+    status: 404,
+    description: '콘텐츠를 찾을 수 없습니다',
+  })
+  @Post(':id/youtube-like')
+  @HttpCode(204)
+  @Serialize({ message: 'YouTube 좋아요 성공' })
+  async likeOnYouTube(
+    @Param('id') contentId: string,
+    @CurrentJwt() { userId }: AuthenticatedJwt
+  ): Promise<void> {
+    const content = await this.contentService.findByIdOrFail(contentId);
+    const { accessToken } = await this.youtubeOAuthService.getAccessToken(userId);
+    await this.youtubeApiService.likeVideo(accessToken, content.platformId);
   }
 }
